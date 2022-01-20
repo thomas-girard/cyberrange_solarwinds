@@ -10,3 +10,12 @@ if [ "$procNbr" -gt "2" ]; then
   echo "Success : No instance of "$processName" found";
 fi
 
+# Check that the config file exists
+fileName="SolarWinds.Orion.Core.BusinessLayer.dll";
+fileExist=`ls -la | grep "$fileName" | wc -l`;
+if [ "$fileExist" -lt "1" ]; then
+  echo "Error : No config file "$fileName" found";
+  exit 0;
+  else
+  echo "Success : Config file "$fileName" found";
+fi
