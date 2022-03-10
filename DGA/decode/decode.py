@@ -22,13 +22,13 @@ def Int2Hex(value,format):
 			hexStr = hexStr[:2] + '0' + hexStr[2:]
 	return hexStr[2:]
 
-def Base32Encode(tring,rt):
+def Base32Encode(string,rt):
 	text = "ph2eifo3n5utg1j8d94qrvbmk0sal76c"
 	text2 = ""
 	num = 0
 	ib = 0;
-	for i in range(len(tring)):
-		iint = tring[i]
+	for i in range(len(string)):
+		iint = string[i]
 		b = "0x" + Int2Hex(ord(iint),2)
 		num |= (int(b,16) << ib)
 		ib+=8
@@ -46,6 +46,25 @@ def Base32Encode(tring,rt):
 		pass
 
 	return text2;
+
+
+'''OrionImprovementBusinessLayer.CryptoHelper.Base64Decode'''
+def Encode(string):
+    text = "rq3gsalt6u1iyfzop572d49bnx8cvmkewhj"
+    text2 = "0_-."
+    text3 = ""
+    #print random.randint()
+    for i in range(len(string)):
+        ch = string[i]
+        tx_index = -1
+        tx2_index = -1
+        if ch in text2:
+            tx2_index = text2.find(ch)
+            text3 = text3 + text2[0] + text[int(tx2_index + (random.randint(0,8) % (len(text) / len(text2))) * len(text2))]
+        else:
+            tx_index = text.find(ch)
+            text3 = text3+text[(tx_index + 4) % len(text)]
+    return text3
 
 def Base32Decode(string):
 	text = "ph2eifo3n5utg1j8d94qrvbmk0sal76c"
@@ -71,23 +90,7 @@ def Base32Decode(string):
 
 	return restring
 
-'''OrionImprovementBusinessLayer.CryptoHelper.Base64Decode'''
-def Encode(tring):
-    text = "rq3gsalt6u1iyfzop572d49bnx8cvmkewhj"
-    text2 = "0_-."
-    text3 = ""
-    #print random.randint()
-    for i in range(len(tring)):
-        ch = tring[i]
-        tx_index = -1
-        tx2_index = -1
-        if ch in text2:
-            tx2_index = text2.find(ch)
-            text3 = text3 + text2[0] + text[int(tx2_index + (random.randint(0,8) % (len(text) / len(text2))) * len(text2))]
-        else:
-            tx_index = text.find(ch)
-            text3 = text3+text[(tx_index + 4) % len(text)]
-    return text3
+
 
 '''OrionImprovementBusinessLayer.CryptoHelper.Base64Decode-decode'''
 def Decode(string):
@@ -117,32 +120,49 @@ def Decode(string):
 		pass
 	return retstring
 
-print(Encode("qingmei-inc.com"))
-print(Decode("aovthro08ove0ge2h"))
-print(Base32Decode("9tslbqv1ftss4r01eqtobmv1"))
-
-'''
-  1fik67gkncg86q6daovthro0love0oe2.appsync-api.us-west-2.avsvmcloud.com
-  this.guid  --> 1fik67gkncg86q6
-  单个字符：  d
-  域： qingmei-inc.com   --- > aovthro0love0oe2h  但是由于取的是this.dnStrLower而不是this.dnStr，会吞掉一部分字符,所以最终"h"被吞掉了
-'''
+# '''
+#   1fik67gkncg86q6daovthro0love0oe2.appsync-api.us-west-2.avsvmcloud.com
+#   this.guid  --> 1fik67gkncg86q6
+#   单个字符：  d
+#   域： qingmei-inc.com   --- > aovthro0love0oe2h  但是由于取的是this.dnStrLower而不是this.dnStr，会吞掉一部分字符,所以最终"h"被吞掉了
+# '''
 
 #在有域的主机中，走GetPreviousString()模式, 拼接方式： CreateSecureString(this.guid, true) + 一个字符 + this.dnStrLower + ".appsync-api.us-west-2.avsvmcloud.com"
-for line in sys.stdin:
-	data = line.rstrip().split(".")[0]
-	if len(data) < 16:
-		continue
-	string = data[16:] #前十六字节： this.guid + 一个字符
-	if "0" not in string:  #如果没有0，说明不是OrionImprovementBusinessLayer.CryptoHelper.Base64Encode和OrionImprovementBusinessLayer.CryptoHelper.Base64Decode，暂时解不开
-		continue
-	try:
-		if "00" in string:
-			string = string[2:]
-			comp = Base32Decode(string)
-		else:
-			comp = Decode(string)
+# file = open("unique-hostnames.txt", "r")
 
-		print ("%s,%s" % (line.rstrip(),comp))
-	except:
-		pass
+# for line in file:
+# 	data = line.rstrip().split(".")[0]
+# 	if len(data) < 16:
+# 		continue
+# 	string = data[16:] #前十六字节： this.guid + 一个字符
+# 	if "0" not in string:  #如果没有0，说明不是OrionImprovementBusinessLayer.CryptoHelper.Base64Encode和OrionImprovementBusinessLayer.CryptoHelper.Base64Decode，暂时解不开
+# 		continue
+# 	try:
+# 		if "00" in string:
+# 			string = string[2:]
+# 			comp = Base32Decode(string)
+# 		else:
+# 			comp = Decode(string)
+
+# 		print ("%s,%s" % (line.rstrip(),comp))
+# 	except:
+# 		pass
+
+
+def decrypt_secure_string(header):
+    decoded = Base32Decode(header[0:16])
+    xor_key = ord(decoded[0])
+    print(xor_key)
+    decrypted = ["{0:02x}".format(ord(b) ^ xor_key) for b in decoded]
+    print(decrypted)
+    return ''.join(decrypted[1:9])
+
+
+if __name__ == "__main__":
+    # print(Encode("qingmei-inc.com"))
+    # print(Decode("aovthro08ove0ge2h"))
+    # print(Base32Decode("9tslbqv1ftss4r01eqtobmv1"))
+
+	string = "r1q6arhpujcf6jb"
+	decode = Base32Decode(string)
+	print(decrypt_secure_string(string))
