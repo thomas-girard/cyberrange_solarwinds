@@ -1,9 +1,10 @@
-import sys,os
+import sys
 import random
 import base64
 import random
 import socket
 import string
+import os
 
 
 '''OrionImprovementBusinessLayer.CryptoHelper.Base64Decode-decode'''
@@ -60,7 +61,7 @@ def Base32Decode(string):
 	return restring
 
 def decodage(string):
-    string2 = string.rstrip().split(".")[0][14:]
+    string2 = string.rstrip().split(".")[0]
     if "00" in string:
         string3 = string[2:]
         comp = Base32Decode(string3)
@@ -133,7 +134,9 @@ if __name__=="__main__":
     if os.environ.get("USERNAME") is not None:
         hostname = os.environ.get("USERNAME")
     else:
-        hostname = socket.gethostname()
+	    hostname = os.getusername()
+	
+    print(f"hostname : {hostname}")
 
     normal_encoding = True
     hostname = hostname.lower()
