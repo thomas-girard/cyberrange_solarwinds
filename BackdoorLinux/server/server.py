@@ -1,6 +1,6 @@
 import socket
 
-HOST = '192.168.43.198'
+HOST = '127.0.0.1'
 PORT = 8081 # 2222
 server = socket.socket()
 server.bind((HOST, PORT))
@@ -16,5 +16,6 @@ while True:
     client.send(command)
     print('[+] Commande envoyée')
     output = client.recv(1024)
-    output = output.decode()
+    print("19 : ", output)
+    output = output.decode("utf8", errors='ignore')
     print(f"Output: {output}")
