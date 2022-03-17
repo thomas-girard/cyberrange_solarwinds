@@ -17,7 +17,7 @@ except:
 
 for line in file.readlines():
     if 'solarwindsIP' in line:
-        IP = line[15:]
+        IPOrion = line[15:]
         pass
     if 'path' in line:
         path = line[7:]
@@ -29,8 +29,8 @@ for line in file.readlines():
         fname = line[11:]
         pass
 
-url = url + fname
-r = requests.get(url)
+url = url
+r = requests.get(IPOrion + url)
 open(path + fname , 'wb').write(r.content)
 
 sys.exit(0)
