@@ -1,7 +1,15 @@
-## Compiler en .exe
+## But :
 
-Pour installer l'outil, lancer la commande : `pip install auto-py-to-exe`
+Le malware fait différentes vérifications de son environnement afin de savoir si son exécution doit continuer.
 
-Pour compiler en .exe, lancer `auto-py-to-exe` et indiquer les informations requises dans l'interface graphique. Le résultat apparait dans le dossier `output`
+### Check 1 : Process
 
-Attention ! Ne pas oublier de mettre le fichier de config dans la version compilée du malware !
+Vérifie si uen autre instance du malware n'est pas déjà en train de tourner. Si c'est le cas, il s'interromp.
+
+### Check 2 : Config File
+
+Vérifie que le fichier SolarWinds.Orion.Core.BusinessLayer.dll est bien présent sur la machine et lisible.
+
+### Check 3 : Config Value
+
+Vérifie que le champ ReportWatcherRetry n'a pas une certaine valeur indiquant au malware de s'arrêter.

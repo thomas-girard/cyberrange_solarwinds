@@ -2,6 +2,7 @@
 import psutil
 from psutil import AccessDenied
 import sys, os
+import glob
 
 
 def processChecking(processName):
@@ -16,28 +17,24 @@ def processChecking(processName):
     # Check if more than 1 instance of processName is running
     if count >= 2:
         print("Error : An instance of " + processName + " is already running\n")
-        input("Press enter to exit...")
-        exit(1)
+        sys.exit(1)
     print("Success : No instance of " + processName + " found\n")
     return 0
 
 
 def getConfigFile(configName, configKey):
     # Get absolute path
-    if getattr(sys, 'frozen', False):
-        path = sys._MEIPASS
-    else:
-        path = os.path.dirname(os.path.abspath(__file__))
-    # Check if config file exists in ./ or ../ and is readable/writable
+    root_dir = "C:/Users/"
+    for filename in glob.iglob(root_dir + '**/**', recursive=True):
+        if configName in filename:
+            path = filename
+            break
+    # Check if config file exists and is readable/writable
     try:
-        file = open(path + "\\" + configName, "r+")
+        file = open(path, "r+")
     except:
-        try:
-             file = open(path + "\\..\\" + configName, "r+")
-        except:
-            print("Error : No config file " + configName + " found or the file is not readable/writable\n")
-            input("Press enter to exit...")
-            exit(1)
+        print("Error : No config file " + configName + " found or the file is not readable/writable\n")
+        sys.exit(1)
     print("Success : Config file " + configName + " found\n")
     # Check if config file asks for malware's interruption
     value = ""
@@ -53,8 +50,7 @@ def getConfigFile(configName, configKey):
             if value == "3":
                 file.close()
                 print("Config Setup : Interrupting malware's network activity...\n")
-                input("Press enter to exit...")
-                exit(1)
+                sys.exit(1)
     print("Config Setup : Proceeding with malware execution...\n")
 
     file.close()
@@ -73,4 +69,4 @@ if __name__ == "__main__":
     configKey = "ReportWatcherRetry"
     getConfigFile(configName, configKey)
 
-    exit(0)
+    sys.exit(0)
