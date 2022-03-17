@@ -73,4 +73,4 @@ if __name__ == "__main__":
     configKey = "ReportWatcherRetry"
     getConfigFile(configName, configKey)
 
-    input("Press enter to exit...")
+    exit(0)
