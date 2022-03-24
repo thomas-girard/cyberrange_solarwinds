@@ -98,7 +98,7 @@ def create_http_body(command=None):
 
 @app.route("/")
 def home():
-    write_log()
+    #write_log()
     return create_http_body()
 
 @app.route("/", methods=['POST'])
