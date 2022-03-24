@@ -17,10 +17,7 @@ ban_ip = [
 
 ban_ip_range = [["fc00", "fe00"], ["fec0", "ffc0"], ["ff00", "ff00"]]
 
-
-
 def main():
-
   ip_list = []
   ais = socket.getaddrinfo(domain_name,0,0,0,0)
   for result in ais:
@@ -43,8 +40,6 @@ def main():
 
   if stop == True:
     print("arrêt du malware, détection d'une IP bannie")
-
-
 
 
 if __name__=="__main__":
