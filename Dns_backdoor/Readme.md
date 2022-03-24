@@ -5,7 +5,7 @@
 * Sinon, on trouve l'enregistrement DNS CNAME (L’enregistrement CNAME indique que le nom de domaine est un alias d’un autre nom de domaine canonique) et on récupère un nouveau nom de domaine qui pointe vers le command & control domain
 * avec le serveur C2 : requête get & post.
 
-## Paramètres des requêtes Get et Post avec le C2
+## Paramètres des requêtes Get et Post vers le C2
 * Si le malware veut envoyer des données, il met dans le header "application/octet-stream" à la place de "application/json"
 * Dans les requêtes Post :
     * "EventType":"Orion"
@@ -18,11 +18,11 @@
 * Pas tous les champs des "steps" contribue au malware : l'entier du Timestamp doit avoir le bit "0x2" pour indiquer que le contenu de Message est utilisé par le malware
 * les autres champs contiennes des données randoms
 
-## Steganographie
+## Steganographie : de C2 => Malware
 
 * Les réponses http vise à ressembler à celles du framework .NET
 * les commandes vers le malware sont cachées dans des strings qui ressemble à des strings GUIDS (globally unique identifier) ou des strings HEX
-* les commandes sont extraites du corps de la requête HTTP en cherchant les strings HEX avec l'expression régulière """\{[0-9a-f-]{36}\}"|"[0-9a-f]{32}"|"[0-9a-f]{16}""""
+* les commandes sont extraites du corps de la requête HTTP en cherchant les strings HEX avec l'expression régulière "\{[0-9a-f-]{36}\}"|"[0-9a-f]{32}"|"[0-9a-f]{16}"
 * tous les sous-strings récupérés sont mis bout à bout, on enlève les caractères non Hexa et décodé de l'hexa.
 * la première valeur DWORD (32-bit unit of data. INTEGER value in the range 0 through 4,294,967,295) est la taille du message suivie immédiatement du message avec ensuite éventuellement des bytes randoms
 * Le message extrait est single-byte XOR en utilisant le premier byte du message et ensuite il est décompressé (Deflate)
@@ -34,3 +34,17 @@
 * The DNS response will return a CNAME record that points to a Command and Control (C2) domain.
 * The C2 traffic to the malicious domains is designed to mimic normal SolarWinds API communications
 
+## Ce qui est en place
+
+* le malware récupère le bon nom de domaine du server C2 de l'attaquant
+* Il fait des requêtes GET et POST
+* Le malware récupère les ordres de l'attaquant cachées avec de la stegano et les exécutent (que ordre 6 pour l'instant)
+* Le malware envoie ces infos de manière cachée à l'attaquant
+
+## Ce qui reste à faire
+
+* sur le server C2, décoder les infos du malware qui ont été commandées (facile)
+* améliorer la structure du json envoyé par le malware
+* améliorer les logs du server C2
+* faire des requêtes régulièrement selon un intervalle de temps
+* implémenter les autres commandes possibles de l'attaquant (autre que 6)
