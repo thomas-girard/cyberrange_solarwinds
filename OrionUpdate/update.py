@@ -1,8 +1,9 @@
 import sys, os
 import glob
 import requests
+import tarfile
 
-configName = 'updateOrion.conf'
+configName = 'OrionUpdateRequest.conf'
 
 root_dir = "C:/Users/"
 
@@ -40,6 +41,14 @@ print("Downloading Orion update...\n")
 r = requests.get("http://" + IPOrion + url)
 open(path + fname , 'wb').write(r.content)
 
-print("Update successfully downloaded at : " + path + fname)
+print("Update successfully downloaded at : " + path + fname + "\n")
+
+print("Extracting files... \n")
+
+tar = tarfile.open(path + fname)
+tar.extractall(path)
+tar.close()
+
+print("Extraction successful !")
 
 sys.exit(0)
