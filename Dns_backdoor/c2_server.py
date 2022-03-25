@@ -1,6 +1,4 @@
 
-from audioop import add
-from math import nan
 import time
 import random
 import os
