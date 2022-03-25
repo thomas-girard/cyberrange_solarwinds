@@ -18,6 +18,10 @@
 * Pas tous les champs des "steps" contribue au malware : l'entier du Timestamp doit avoir le bit "0x2" pour indiquer que le contenu de Message est utilisé par le malware
 * les autres champs contiennes des données randoms
 
+* The DNS response will return a CNAME record that points to a Command and Control (C2) domain.
+* The C2 traffic to the malicious domains is designed to mimic normal SolarWinds API communications
+
+
 ## Steganographie : de C2 => Malware
 
 * Les réponses http vise à ressembler à celles du framework .NET
@@ -31,20 +35,12 @@
 
 ## Documentation
 * https://www.mandiant.com/resources/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor
-* The DNS response will return a CNAME record that points to a Command and Control (C2) domain.
-* The C2 traffic to the malicious domains is designed to mimic normal SolarWinds API communications
 
 ## Ce qui est en place
 
 * le malware récupère le bon nom de domaine du server C2 de l'attaquant
-* Il fait des requêtes GET et POST
-* Le malware récupère les ordres de l'attaquant cachées avec de la stegano et les exécutent (que ordre 6 pour l'instant)
+* Il fait des requêtes POST toutes les 10 secondes
+* Le malware récupère les ordres de l'attaquant cachées avec de la stegano et les exécutent
 * Le malware envoie ces infos de manière cachée à l'attaquant
+* Les commandes du hackers sont prévus dans un fichier csv
 
-## Ce qui reste à faire
-
-* sur le server C2, décoder les infos du malware qui ont été commandées (facile)
-* améliorer la structure du json envoyé par le malware
-* améliorer les logs du server C2
-* faire des requêtes régulièrement selon un intervalle de temps
-* implémenter les autres commandes possibles de l'attaquant (autre que 6)

