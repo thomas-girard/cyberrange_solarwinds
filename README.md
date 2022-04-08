@@ -5,6 +5,7 @@
 Doc intéressante : 
 - https://www.mandiant.com/resources/sunburst-additional-technical-details
 - https://github.com/CyberSecOps/SolarWinds-Sunburst-Solorigate-Supernova-FireEye
+-https://www.mandiant.com/resources/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor
 
 
 

