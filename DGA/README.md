@@ -28,6 +28,7 @@
     - https://blog.cloudflare.com/a-quirk-in-the-sunburst-dga-algorithm/
     - https://github.com/RedDrip7/SunBurst_DGA_Decode
     - https://mp.weixin.qq.com/s/v-ekPFtVNZG1W7vWjcuVug
+    - https://symantec-enterprise-blogs.security.com/blogs/threat-intelligence/solarwinds-unique-dga
 
 
 
