@@ -158,7 +158,7 @@ def find_desired_order(file_path_command):
 
     if file_path_command not in os.listdir():
         # creation of the csv of the desired order with random value
-        df = pd.DataFrame(data={"order":[5, 5, 6], "additional_data":["dir", "whoami", ""], "state":["waiting", "waiting", "waiting"]})
+        df = pd.DataFrame(data={"order":[5, 5, 6, 5], "additional_data":["powershell.exe dir", "powershell.exe whoami", "", "powershell.exe Get-ADDomain"], "state":["waiting", "waiting", "waiting", "waiting"]})
         print(df)
         df.to_csv(file_path_command, index=False)
 
