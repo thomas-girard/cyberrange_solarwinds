@@ -19,7 +19,7 @@ from datetime import datetime
 from psutil import AccessDenied
 
 #main_url = "http://192.168.132.2:8081/"
-main_url = "http://127.0.0.1:8081/"
+main_url = "http://10.2.232.200:8081/"
 
 domain_name = "i32hu6i32hu6.appsync-api.us-east-2.avsvmcloud.com" # = output of DGA algo
 

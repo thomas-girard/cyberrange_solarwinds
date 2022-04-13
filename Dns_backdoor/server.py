@@ -203,6 +203,6 @@ def send_instruction():
 
 if __name__ == "__main__":
     #HOST = '192.168.132.2'
-    HOST = "127.0.0.1"
-    PORT = 8081 
+    HOST = "10.2.232.200"
+    PORT = 8081
     app.run(debug=True, host = HOST, port = PORT)
