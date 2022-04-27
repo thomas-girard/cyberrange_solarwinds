@@ -1,24 +1,8 @@
 # cyberrrange
 
+Ce projet a été mené par 3 étudiants de CentraleSupelec en dernière année en mention cybersécurité (Vangelis Hoareau, Tanguy Boisset et Thomas Girard) et a eu pour but de comprendre, reproduire et implémenter sur l'outil CyberRange d'Airbus l'attaque informatique Sunburst qui a touché les clients de SolarWinds. Une documentation ainsi que les slides de la soutenance finale sont présents dans le dossier 'documentation'.
+
+Nous remercions enfin notre encadrant Nicolas Scouarnec et Valérie Viet Triem Tong pour leurs disponibilités et leurs conseils tout au long du projet !
+
+
 ![](img/sunburst.png)
-
-Doc intéressante : 
-- https://www.mandiant.com/resources/sunburst-additional-technical-details
-- https://github.com/CyberSecOps/SolarWinds-Sunburst-Solorigate-Supernova-FireEye
--https://www.mandiant.com/resources/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor
-
-
-
-## Compiler en .exe
-
-Pour installer l'outil, lancer la commande : `pip install auto-py-to-exe`. cf : https://pypi.org/project/auto-py-to-exe/
-
-Pour compiler en .exe, lancer `auto-py-to-exe` et indiquer les informations requises dans l'interface graphique. Le résultat apparait dans le dossier `output`
-
-Attention ! Ne pas oublier de mettre le fichier de config dans la version compilée du malware !
-
-## Pour upload un fichier sur Cyberrange :
-
-Rendre exécutable le fichier : `chmod +x <fichier>`
-
-Le placer dans un .tar : `tar -cvf <tar> <fichier>`
