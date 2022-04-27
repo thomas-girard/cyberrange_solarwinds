@@ -11,7 +11,7 @@ Ce repository possède des dossiers pour chaque grande étape de l'attaque :
 * 3-Anti-AnalysisCheck
 * 4-CommunicationC2Server
 
-Les slides de la soutenance finale sont présente dans ce même dossier. Notre implémentation est uniquement en python, nous avons créé des .exe de ce code python avec `auto-py-to-exe` avant d'exécuter le tout sur l'outil CyberRange d'Airbus.
+Les slides de la soutenance finale sont présentes dans le dossier *annex*. Notre implémentation est uniquement en python, nous avons créé des .exe de ce code python avec `auto-py-to-exe` avant d'exécuter le tout sur l'outil CyberRange d'Airbus.
 
 Nous avons travaillé uniquement sur **Sunburst** et non sur la compromission initiale de SolarWind (cf slides de la soutenance finale).
 
@@ -53,37 +53,20 @@ Ce dossier possède 3 sous-dossiers :
  ![](img/topologie.png)
 
 
-Dans cette modélisation nous avons choisi une topologie d'entreprise basée sur un Active Directory. Un serveur Orion est déployée sur un réseau dit "admin".
-
-
-
+Dans cette modélisation nous avons choisi une topologie d'entreprise basée sur un Active Directory. Un serveur Orion est déployée sur un réseau dit *admin*.
 
 ## L'attaque
 
-
-
-
 Nous avons essayé de représenter fidèlement la logique de l'intrusion des attaquants dans le réseau de leurs victimes, en prenant en compte leur attention particulière à la discrétion. Puis nous avons implémenté nous-même une attaque réaliste une fois la backdoor créée.
-
-
-
 
 ### Scénario
 
-
-
-
-Une fois en possession d'une backdoor vers le serveur Orion de l'entreprise, l'attaque lance une reconnaissance sur le réseau sur lequel il est présent ... [à continuer]
-
-
-
+Une fois en possession d'une backdoor vers le serveur Orion de l'entreprise, l'attaque lance une reconnaissance sur le réseau sur lequel il est présent.
 
 ### Implémentation des actions sur CyberRange
 
 
-
-
-Afin de créer un scénario sur l'outil CyberRange, nous avons découpé l'attaque de manière logique afin de montrer visuellement et temporellement la chaîne de décision ainsi que l'attaque. Dans l'espace CyberRange dédié à l'attaque vous trouverez X actions qui constitueront le coeur du scénario.
+Afin de créer un scénario sur l'outil CyberRange, nous avons découpé l'attaque de manière logique afin de montrer visuellement et temporellement la chaîne de décision ainsi que l'attaque. Dans l'espace CyberRange dédié à l'attaque vous trouverez nos actions qui constitueront le coeur du scénario.
 
 #### __Les différentes actions :__
 
@@ -109,7 +92,7 @@ Cette archive contient :
 
 - `Anti-Analysis Check`: L'action exécute Anti-AnalysisCheck.exe qui se situe dans le repertoire `C:/Program Files (x86)/Orion/modules/anti_analysis.exe`
 
-- `Dns_backdoor`: L'action exécute Anti-AnalysisCheck.exe qui se situe dans le repertoire `C:/Program Files (x86)/Orion/modules/anti_analysis.exe`
+- `Dns_backdoor`: L'action exécute Dns_backdoor.exe qui se situe dans le repertoire `C:/Program Files (x86)/Orion/modules/Dns_backdoor.exe`
 
 
 ## Faire marcher la machine Orion :
