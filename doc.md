@@ -72,11 +72,11 @@ Déroulement temporel de l'attaque SolarWinds :
 
 ### 1. OrionUpdate 
 
-Contient le code et l'exécutable au départ du scénario. Celui lance une mise à jour vérolée du serveur Orion qu'il va chercher sur un serveur SolarWinds distant. Celle-ci contiendra toute les autres parties qui suivent. 
+Contient le code et l'exécutable au départ du scénario. Celui lance une mise à jour vérolée du serveur Orion qu'il va chercher sur un serveur SolarWinds distant. Celle-ci contiendra toutes les autres parties qui suivent. 
 
 ### 2. EnvironmentCheck 
 
-Ce dossier contien la partie du programme chargée de : 
+Ce dossier contient la partie du programme chargée de : 
 
 - Vérifier qu'une autre instance n'est pas déjà en cours d'exécution. 
 
@@ -94,7 +94,7 @@ Ce dossier contient la partie chargée de détecter si un processus ou un servic
 
 ### 5. DGA 
 
-Ce dossier contient l'algorithme de génération de nom de domaines aléatoires  
+Ce dossier contient l'algorithme de génération de noms de domaines aléatoires  
 
 ### 6. Dns_backdoor 
 
@@ -105,9 +105,9 @@ Ce dossier contient la backdoor qu'ouvrira le malware chez la victime. Il s'agit
  
  
 
-## Topologie sur Cyber 
+## Topologie sur Cyberrange
 
- 
+ ![](img/topologie.png)
  
 
 Dans cette modélisation nous avons choisi une topologie d'entreprise basée sur un Active Directory. Un serveur Orion est déployée sur un réseau dit "admin".  
@@ -115,7 +115,7 @@ Dans cette modélisation nous avons choisi une topologie d'entreprise basée sur
  
  
 
-## L''attaque 
+## L'attaque 
 
  
  
@@ -148,9 +148,11 @@ Afin de créer un scénario sur l'outil CyberRange, nous avons découpé l'attaq
 
 - `Installation Orion` : Cette action est un pré-requis au scénario à jouer sur l'hôte qui servira de machine victime. Elle upload le fichier `Installation Orion.tar` et le  désarchive dans le `C:\"Program Files (x86)"\Orion\`. Ne possédant pas la licence _Orion_, cette archive contient un programme qui jouera le rôle de couche graphique simulant le bon fonctionnement du logiciel ciblé.
 Cette archive contient :
-    - a
-    - a
-    - a
+    - `orion.exe` : un 'dummy program' dont le but est de symboliser le logiciel légitime de Solarwinds
+    - un faux fichier de licence
+    - le logo de SolarWinds
+    - un faux fichier de configuration `OrionUpdateRequest.conf`
+    - `update.exe` : programme légitime permettant de mettre à jour Orion
 
 - `Update Orion` : Cette action est le départ de l'attaque. Elle exécute `orionUpdate.exe` qui télécharge les fichiers suivants dans le répertoire `C:/Program Files (x86)/Orion/modules/`
     - `environmentCheck.exe`
@@ -169,41 +171,26 @@ Cette archive contient :
 
 ## Faire marcher la machine Orion :  
 
+Ci-dessous figurent les diverses instructions concernant le bon déroulement technique de l'attaque sur notre topologie.
+
+**Pare-feu** : par manque de temps, les pare-feu ont été simplement désactivés dans la topologie fournie. Pour une meilleure représentation de la réalité, il serait préférable d'ajouter des règles de NAT ainsi que de whitelister les échanges provenant du serveur Orion.
  
+**Se connecter aux machines** : il est possible de se connecter aux machines avec le compte administrateur de l'Active Directory en utilisant les credentials suivant :
+- User : `SIGEN\Administrator`
+- Password : `SIGEN\Administrator`
+
+**Redémarrage de l'AD** : pour des raisons inconnues, les machines AD et DFS s'éteignent toutes les 2h30 environ. Pour que l'attaque fonctionne, la machine AD doit être rédémarrée et il faut se connecter avec les credentials ci-dessus.
  
+**Redémmarrage d'Orion** : la machine Orion a aussi tendance a reboot sans raison particulière. Pour que l'attaque fonctionne, il faut procéder aux manipulations suivantes (il serait préférable à terme d'automatiser ces opérations) :
+- Démarrer un shell Powershell
+- Lancer la commande `Test-NetConnection sigen.net -port 9389`
+- Vérifier que la connexion est opérationnelle avec la commande `Get-ADDomain -Identity sigen.net`
+- *En cas d'échec* : Lancer la commande `Set-ExecutionPolicy RemoteSigned`
 
-Bug avec l’AD : s’éteint tout seul sans raison. Il faut le redémarrer et se connecter dessus pour que tout remarche (avec SIGEN\Administrator:SIGEN\Administrator)  
-
+**Commandes au LDAP** : pour envoyer des commandes au LDAP, il faut :
+- Avoir installé le module activedirectory sur la machine Orion (c'est déjà le cas sur la mâchine fournie). Sinon, lancer la commande `import-module activedirectory` dans un Powershell.
+- Préciser l'identité à contacter en rajoutant `-Identity sigen.net`.
  
- 
-
-Orion Server : pour se connecter à l’AD, on utilise la variable d’environnement LOGONSERVER qui par défault n’est pas correcte. Il faut la changer avec la commande suivante (sur PowerShell) :  
-
- 
- 
-
-$env:LOGONSERVER=”\\AD”  
-
- 
- 
-
-Puis vérifier la connexion avec la commande :  
-
- 
- 
-
-Test-NetConnection sigen.net -port 9389  
-
- 
- 
-
-Pour faire les commandes de l’AD, ajouter –Identity sigen.net  
-
- 
-
-Activer cette commande sur le serveur pour pouvoir faire des commandes PowerShell depuis le malware :  
-
-Set-ExecutionPolicy RemoteSigned 
 
  
  
