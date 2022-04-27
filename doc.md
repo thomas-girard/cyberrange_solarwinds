@@ -1,148 +1,91 @@
-# Documentation Projet Solarwinds CyberRange  
+# Documentation Projet Solarwinds CyberRange
 
- 
- 
+## Introduction
 
-## Introduction : 
+![Description générale de Sunburst](img/sunburst.png)
 
- 
- 
+Ce repository possède des dossiers pour chaque grande étape de l'attaque :
 
-Déroulement temporel de l'attaque SolarWinds : 
+* 1-Initialization
+* 2-EnvironmentCheck
+* 3-Anti-AnalysisCheck
+* 4-CommunicationC2Server
 
-![](img/sunburst.png) 
+Les slides de la soutenance finale sont présente dans ce même dossier. Notre implémentation est uniquement en python, nous avons créé des .exe de ce code python avec `auto-py-to-exe` avant d'exécuter le tout sur l'outil CyberRange d'Airbus.
 
- 
- 
+Nous avons travaillé uniquement sur **Sunburst** et non sur la compromission initiale de SolarWind (cf slides de la soutenance finale).
 
-## Contenu du livrable :  
 
- 
+## Description technique
 
-- Un dossier contenant le programme de mise à jour du logiciel ciblé : `Obfuscation` 
 
- 
+### 1-Initialization
 
- 
+Ce dossier possède 2 sous-dossiers :
 
-- Un dossier contenant le programme de mise à jour du logiciel ciblé : `OrionUpdate`  
+* Obfuscation : ce dossier contient les icônes, licences et fonctions permettants d'obfusquer au mieux l'exécution du malware afin de le faire passer pour un logiciel légitime.
+* OrionUpdate : cette partie correspond à la mise à jour initiale de Orion avec la version compromise. Pour cela, le code recherche le fichier *OrionUpdateRequest.conf* qui contient l'IP d'un serveur distant puis télécharge le contenu et extrait les fichiers qui contiennent toutes les étapes suivantes du malware.
 
- 
- 
 
-- Un dossier contenant le programme d’analyse d’environnement : `EnvironmentCheck`  
+### 2-EnvironmentCheck
 
- 
- 
+Ce dossier possède 2 sous-dossiers :
 
-- Un dossier contenant le programme de découverte de domaine d’active directory (TBI) : `DomainDiscovery`  
+* CheckMalware : cela correspond à la vérification qu'une seule instance du malware est en exécution et que le fichier *SolarWinds.Orion.Core.BusinessLayer.dll.config* (qui sert à stocker des paramètres du malware) est bien présent. Un fichier *README.md* dans ce dossier apporte plus de précisions.
+* DomainDiscovery : le malware vérifie que l'active directory présent ne contient pas certaines valeurs internes à Solarwinds afin d'être certain que le malware s'exécute chez un client de Solarwinds.
 
- 
- 
+### 3-Anti-AnalysisCheck
 
-- Un dossier contenant le programme de détection d’outil d’analyse : `antiAnalysisCheck`  
+Ce dossier contient la partie chargée de détecter si un processus ou un service représente une menace pour le bon déroulement de l'attaque. Le programme liste les processus et services en cours sur l'hôte, et possède une liste hardcodée de programmes que le malware tentera d'éviter en tentant de les arrêter ou en stoppant l'attaque.
 
- 
- 
+### 4-CommunicationC2Server
 
-- Un dossier contenant le programme de génération aléatoire de domaine : `DGA`  
+Ce dossier possède 3 sous-dossiers :
 
- 
- 
+* Backdoor : ce code permet la communication entre le malware et le serveur C2 de l'attaquant à l'aide de requête DNS puis de requêtes HTTP. Toute la partie de commuunication par requêtes DNS a été commenté car nous n'avons pas implémenté cela dans Cyberrange (nous avons hard-codé l'IP de l'attaquant sur Cyberrange). Le serveur de l'attaquant est un serveur Flask et ce dernier précise les commandes qu'ils souhaite exécuter à distance dans le fichier *commands.csv* puis récupère les informations dans le fichier *c2_log.txt*. Les slides 19 à 26 de la soutenance finale apportent davantage de précisions. Un fichier *README.md* est également présent dans ce dossier *Backdoor*.
+* DGA : ce dossier correspond à l'algorithme de génération des noms de domaine. Le domaine généré permet la première communication avec l'attaquant avec des requêtes DNS. Ce code n'a pas été utilisé dans notre implémentation sur Cyberrange.
+* MinimalBackdoor : ce code nous a permis de tester qu'une backdoor minimaliste était possible sur Cyberrange.
 
-- Un dossier contenant le programme ouvrant une backdoor HTTP : `Dns_backdoor`  
 
- 
- 
-
-- Un dossier contenant le programme ouvrant une backdoor TCP (TBR?) : `BackdoorLinux`  
-
- 
- 
-
-- Un dossier img contenant différentes images liées à _SolarWinds_ 
-
- 
- 
-
-## Description de chaque programme 
-
- 
- 
-
-### 1. OrionUpdate 
-
-Contient le code et l'exécutable au départ du scénario. Celui lance une mise à jour vérolée du serveur Orion qu'il va chercher sur un serveur SolarWinds distant. Celle-ci contiendra toutes les autres parties qui suivent. 
-
-### 2. EnvironmentCheck 
-
-Ce dossier contient la partie du programme chargée de : 
-
-- Vérifier qu'une autre instance n'est pas déjà en cours d'exécution. 
-
-- Vérifier si le fichier de configuration SolarWinds.Orion.Core.BusinessLayer.dll est présent et lisible. 
-
-- Vérifier si le champ ReportWatcherRetry du fichier SolarWinds.Orion.Core.BusinessLayer.dll n'a pas une certaine valeur indiquant au malware de s'arrêter. 
-
-### 3. discoverDomain 
-
-Ce dossier contient la partie du programme chargée de découvrir le nom de domaine de l'active directory sur lequel est déployé l'hôte. Ceci permet de reconnaître un domaine parmis une liste de nom sur lequel l'attaquant ne voudrait pas opérer, comme par exemple le domaine de l'entreprise SolarWinds, souche de l'attaque. 
-
-### 4. antiAnalysisCheck 
-
-Ce dossier contient la partie chargée de détecter si un processus ou un service représente une menace pour le bon déroulement de l'attaque. Le programme liste les processus et services en cours sur l'hôte, et possède une liste hardcodée de programmes que le malware tentera d'éviter en tentant de les arrêter ou en stoppant l'attaque. 
-
-### 5. DGA 
-
-Ce dossier contient l'algorithme de génération de noms de domaines aléatoires  
-
-### 6. Dns_backdoor 
-
-Ce dossier contient la backdoor qu'ouvrira le malware chez la victime. Il s'agit d'un client HTTP qui va communiquer de manière obfusquée avec le serveur C&C de l'attaquant afin de récupérer des ordres grâce à des requêtes GET/POST et exécuter des commandes sur l'hôte. 
-
-### 7. BackdoorLinux? 
-
- 
- 
 
 ## Topologie sur Cyberrange
 
  ![](img/topologie.png)
- 
 
-Dans cette modélisation nous avons choisi une topologie d'entreprise basée sur un Active Directory. Un serveur Orion est déployée sur un réseau dit "admin".  
 
- 
- 
+Dans cette modélisation nous avons choisi une topologie d'entreprise basée sur un Active Directory. Un serveur Orion est déployée sur un réseau dit "admin".
 
-## L'attaque 
 
- 
- 
 
-Nous avons essayé de représenter fidèlement la logique de l'intrusion des attaquants dans le réseau de leurs victimes, en prenant en compte leur attention particulière à la discrétion. Puis nous avons implémenté nous-même une attaque réaliste une fois la backdoor créée. 
 
- 
- 
+## L'attaque
 
-### Scénario 
 
- 
- 
 
-Une fois en possession d'une backdoor vers le serveur Orion de l'entreprise, l'attaque lance une reconnaissance sur le réseau sur lequel il est présent ... [à continuer] 
 
- 
- 
+Nous avons essayé de représenter fidèlement la logique de l'intrusion des attaquants dans le réseau de leurs victimes, en prenant en compte leur attention particulière à la discrétion. Puis nous avons implémenté nous-même une attaque réaliste une fois la backdoor créée.
 
-### Implémentation des actions sur CyberRange 
 
- 
- 
 
-Afin de créer un scénario sur l'outil CyberRange, nous avons découpé l'attaque de manière logique afin de montrer visuellement et temporellement la chaîne de décision ainsi que l'attaque. Dans l'espace CyberRange dédié à l'attaque vous trouverez X actions qui constitueront le coeur du scénario. 
 
-#### __Les différentes actions :__ 
+### Scénario
+
+
+
+
+Une fois en possession d'une backdoor vers le serveur Orion de l'entreprise, l'attaque lance une reconnaissance sur le réseau sur lequel il est présent ... [à continuer]
+
+
+
+
+### Implémentation des actions sur CyberRange
+
+
+
+
+Afin de créer un scénario sur l'outil CyberRange, nous avons découpé l'attaque de manière logique afin de montrer visuellement et temporellement la chaîne de décision ainsi que l'attaque. Dans l'espace CyberRange dédié à l'attaque vous trouverez X actions qui constitueront le coeur du scénario.
+
+#### __Les différentes actions :__
 
 - `Initialisation Orion` : Cette action est un pré-requis au scénario à jouer sur l'hôte qui servira de machine victime. Elle crée le répertoire `Orion` et `Orion\modules` à l'emplacement `C:\"Program Files (x86)"\Orion\`
 
@@ -156,9 +99,9 @@ Cette archive contient :
 
 - `Update Orion` : Cette action est le départ de l'attaque. Elle exécute `orionUpdate.exe` qui télécharge les fichiers suivants dans le répertoire `C:/Program Files (x86)/Orion/modules/`
     - `environmentCheck.exe`
-    - `DomainDiscovery.exe` 
+    - `DomainDiscovery.exe`
     - `antiAnalysisCheck.exe`
-    - `Dns_backdoor.exe` 
+    - `Dns_backdoor.exe`
 
 - `Environment Checking`: L'action exécute EnvironmentCheck.exe qui se situe dans le repertoire `C:/Program Files (x86)/Orion/modules/envCheck.exe`
 
@@ -167,35 +110,42 @@ Cette archive contient :
 - `Anti-Analysis Check`: L'action exécute Anti-AnalysisCheck.exe qui se situe dans le repertoire `C:/Program Files (x86)/Orion/modules/anti_analysis.exe`
 
 - `Dns_backdoor`: L'action exécute Anti-AnalysisCheck.exe qui se situe dans le repertoire `C:/Program Files (x86)/Orion/modules/anti_analysis.exe`
- 
 
-## Faire marcher la machine Orion :  
+
+## Faire marcher la machine Orion :
 
 Ci-dessous figurent les diverses instructions concernant le bon déroulement technique de l'attaque sur notre topologie.
 
 **Pare-feu** : par manque de temps, les pare-feu ont été simplement désactivés dans la topologie fournie. Pour une meilleure représentation de la réalité, il serait préférable d'ajouter des règles de NAT ainsi que de whitelister les échanges provenant du serveur Orion.
- 
+
 **Se connecter aux machines** : il est possible de se connecter aux machines avec le compte administrateur de l'Active Directory en utilisant les credentials suivant :
+
 - User : `SIGEN\Administrator`
 - Password : `SIGEN\Administrator`
 
 **Redémarrage de l'AD** : pour des raisons inconnues, les machines AD et DFS s'éteignent toutes les 2h30 environ. Pour que l'attaque fonctionne, la machine AD doit être rédémarrée et il faut se connecter avec les credentials ci-dessus.
- 
+
 **Redémmarrage d'Orion** : la machine Orion a aussi tendance a reboot sans raison particulière. Pour que l'attaque fonctionne, il faut procéder aux manipulations suivantes (il serait préférable à terme d'automatiser ces opérations) :
+
 - Démarrer un shell Powershell
 - Lancer la commande `Test-NetConnection sigen.net -port 9389`
 - Vérifier que la connexion est opérationnelle avec la commande `Get-ADDomain -Identity sigen.net`
 - *En cas d'échec* : Lancer la commande `Set-ExecutionPolicy RemoteSigned`
 
 **Commandes au LDAP** : pour envoyer des commandes au LDAP, il faut :
+
 - Avoir installé le module activedirectory sur la machine Orion (c'est déjà le cas sur la mâchine fournie). Sinon, lancer la commande `import-module activedirectory` dans un Powershell.
 - Préciser l'identité à contacter en rajoutant `-Identity sigen.net`.
- 
 
- 
- 
- 
- 
- 
 
- 
+## Bibliographie : principaux articles
+
+- <https://www.mandiant.com/resources/sunburst-additional-technical-details>
+- <https://github.com/CyberSecOps/SolarWinds-Sunburst-Solorigate-Supernova-FireEye>
+- <https://www.mandiant.com/resources/evasive-attacker-leverages-solarwinds-supply-chain-compromises-with-sunburst-backdoor>
+- <https://blog.cloudflare.com/a-quirk-in-the-sunburst-dga-algorithm/>
+- <https://symantec-enterprise-blogs.security.com/blogs/threat-intelligence/solarwinds-unique-dga>
+
+
+
+
